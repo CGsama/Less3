@@ -428,7 +428,7 @@ namespace Less3.Storage
         {
             string keyHash = BitConverter.ToString(Common.Sha256(key)).Replace("-", "").ToLower();
             if (File.Exists(_BaseDirectory + keyHash)) {
-                string dataHash = File.ReadAllText(key).Trim();
+                string dataHash = File.ReadAllText(_BaseDirectory + keyHash).Trim();
                 return _BaseDirectory + dataHash;
             }
             return _BaseDirectory + "thisfiledoesnotexists";
