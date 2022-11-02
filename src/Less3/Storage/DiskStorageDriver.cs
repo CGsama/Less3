@@ -420,13 +420,13 @@ namespace Less3.Storage
          
         private string FileIndexPath(string key)
         {
-            string keyHash = BitConverter.ToString(Sha256(key)).Replace('-', '').ToLower();
+            string keyHash = BitConverter.ToString(Sha256(key)).Replace('-', "").ToLower();
             return _BaseDirectory + keyHash;
         }
         
         private string FilePath(string key)
         {
-            string keyHash = BitConverter.ToString(Sha256(key)).Replace('-', '').ToLower();
+            string keyHash = BitConverter.ToString(Sha256(key)).Replace('-', "").ToLower();
             if (File.Exists(_BaseDirectory + keyHash)) {
                 string dataHash = File.ReadAllText(key);
                 return _BaseDirectory + dataHash;
@@ -436,8 +436,8 @@ namespace Less3.Storage
         
         private string FilePath(string key, Stream stream)
         {
-            string keyHash = BitConverter.ToString(Sha256(key)).Replace('-', '').ToLower();
-            string dataHash = BitConverter.ToString(Sha256(stream)).Replace('-', '').ToLower();
+            string keyHash = BitConverter.ToString(Sha256(key)).Replace('-', "").ToLower();
+            string dataHash = BitConverter.ToString(Sha256(stream)).Replace('-', "").ToLower();
             stream.Position = 0;
             File.WriteAllText(_BaseDirectory + keyHash, dataHash);
             return _BaseDirectory + dataHash;
