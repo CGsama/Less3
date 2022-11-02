@@ -72,7 +72,7 @@ namespace Less3.Storage
         public override void Delete(string key)
         {
             if (String.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
-            string file = FilePath(key);
+            string file = FileIndexPath(key);
             if (File.Exists(file)) File.Delete(file);
         }
 
@@ -84,7 +84,7 @@ namespace Less3.Storage
         public override bool Exists(string key)
         {
             if (String.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
-            string file = FilePath(key);
+            string file = FileIndexPath(key);
             if (File.Exists(file)) return true;
             return false;
         }
@@ -351,7 +351,7 @@ namespace Less3.Storage
         { 
             if (String.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
 
-            string file = FilePath(key);
+            string file = FilePath(key, stream);
             using (FileStream fs = new FileStream(file, FileMode.Create))
             {
                 long bytesRemaining = contentLength;
@@ -388,7 +388,7 @@ namespace Less3.Storage
         {
             if (String.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
 
-            string file = FilePath(key);
+            string file = FilePath(key, stream);
             using (FileStream fs = new FileStream(file, FileMode.Create))
             {
                 long bytesRemaining = contentLength;
@@ -418,9 +418,29 @@ namespace Less3.Storage
 
         #region Private-Methods
          
+        private string FileIndexPath(string key)
+        {
+            string keyHash = BitConverter.ToString(Sha256(key)).Replace('-', '').ToLower();
+            return _BaseDirectory + keyHash;
+        }
+        
         private string FilePath(string key)
         {
-            return _BaseDirectory + key;
+            string keyHash = BitConverter.ToString(Sha256(key)).Replace('-', '').ToLower();
+            if (File.Exists(_BaseDirectory + keyHash)) {
+                string dataHash = File.ReadAllText(key);
+                return _BaseDirectory + dataHash;
+            }
+            return _BaseDirectory + "thisfiledoesnotexists";
+        }
+        
+        private string FilePath(string key, Stream stream)
+        {
+            string keyHash = BitConverter.ToString(Sha256(key)).Replace('-', '').ToLower();
+            string dataHash = BitConverter.ToString(Sha256(stream)).Replace('-', '').ToLower();
+            stream.Position = 0;
+            File.WriteAllText(_BaseDirectory + keyHash, dataHash);
+            return _BaseDirectory + dataHash;
         }
          
         #endregion
