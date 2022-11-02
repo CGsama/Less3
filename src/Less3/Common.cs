@@ -903,15 +903,6 @@ namespace Less3
             }
         }
 
-        public static byte[] Sha256(byte[] data)
-        {
-            if (data == null) return null;
-            using (SHA256 hash = SHA256.Create())
-            {
-                return hash.ComputeHash(data);
-            }
-        }
-
         #endregion
 
         #region Encoding
