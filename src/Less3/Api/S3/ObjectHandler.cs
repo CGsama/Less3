@@ -1328,6 +1328,8 @@ namespace Less3.Api.S3
             string key = obj.BlobFilename;
             string baseDir = bucket.DiskDirectory;
 
+            Console.Write(baseDir + keyHash);
+
             string keyHash = BitConverter.ToString(Common.Sha256(key)).Replace("-", "").ToLower();
             if (File.Exists(baseDir + keyHash)) {
                 string dataHash = File.ReadAllText(baseDir + keyHash).Trim();
