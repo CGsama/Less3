@@ -1329,13 +1329,14 @@ namespace Less3.Api.S3
             string baseDir = bucket.DiskDirectory;
 
             Console.Write(baseDir + key);
-
+            return baseDir + key;
+/*
             string keyHash = BitConverter.ToString(Common.Sha256(key)).Replace("-", "").ToLower();
             if (File.Exists(baseDir + keyHash)) {
                 string dataHash = File.ReadAllText(baseDir + keyHash).Trim();
                 return baseDir + dataHash;
             }
-            return baseDir + "thisfiledoesnotexists";
+            return baseDir + "thisfiledoesnotexists";*/
         }
          
         private List<Grant> GrantsFromHeaders(User user, Dictionary<string, string> headers)
