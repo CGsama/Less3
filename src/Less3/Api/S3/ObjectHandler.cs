@@ -1328,7 +1328,7 @@ namespace Less3.Api.S3
             string key = obj.BlobFilename;
             string baseDir = bucket.DiskDirectory;
 
-            Console.Write(baseDir + keyHash);
+            Console.Write(baseDir + key);
 
             string keyHash = BitConverter.ToString(Common.Sha256(key)).Replace("-", "").ToLower();
             if (File.Exists(baseDir + keyHash)) {
