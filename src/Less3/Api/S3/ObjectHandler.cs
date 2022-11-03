@@ -1325,7 +1325,15 @@ namespace Less3.Api.S3
 
         private string GetObjectBlobFile(Classes.Bucket bucket, Obj obj)
         {
-            return bucket.DiskDirectory + obj.BlobFilename;
+            string key = obj.BlobFilename;
+            string baseDir = bucket.DiskDirectory;
+
+            string keyHash = BitConverter.ToString(Common.Sha256(key)).Replace("-", "").ToLower();
+            if (File.Exists(baseDir + keyHash)) {
+                string dataHash = File.ReadAllText(baseDir + keyHash).Trim();
+                return baseDir + dataHash;
+            }
+            return baseDir + "thisfiledoesnotexists";
         }
          
         private List<Grant> GrantsFromHeaders(User user, Dictionary<string, string> headers)
