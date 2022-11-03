@@ -1339,8 +1339,10 @@ namespace Less3.Api.S3
             //Console.Write(baseDir + keyHash);
             if (File.Exists(fileIndex)) {
                 string dataHash = File.ReadAllText(fileIndex).Trim();
+                string _unifyDir = _Settings.Storage.DiskDirectory;
+                if (!_unifyDir.EndsWith("/")) _unifyDir += "/";
                 //Console.Write(dataHash);
-                return baseDir + dataHash;
+                return _unifyDir + dataHash;
             }
             //Console.Write("no such file");
             return baseDir + "thisfiledoesnotexists";
