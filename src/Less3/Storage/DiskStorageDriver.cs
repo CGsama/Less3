@@ -39,6 +39,7 @@ namespace Less3.Storage
         private CancellationTokenSource _TokenSource = new CancellationTokenSource();
         private CancellationToken _Token;
         private string _BaseDirectory = null;
+        private string _unifyDir = null;
         private int _StreamBufferSize = 65536;
 
         #endregion
@@ -59,6 +60,9 @@ namespace Less3.Storage
 
             _BaseDirectory = baseDirectory;
             _Token = _TokenSource.Token;
+            _unifyDir = Settings.FromFile("system.json").Storage.DiskDirectory;
+            if (!_unifyDir.EndsWith("/")) _unifyDir += "/";
+            _unifyDir += "_unify/";
         }
 
         #endregion
@@ -352,19 +356,22 @@ namespace Less3.Storage
             if (String.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
 
             string file = FilePath(key, stream);
-            using (FileStream fs = new FileStream(file, FileMode.Create))
-            {
-                long bytesRemaining = contentLength;
-                int read = 0;
-                byte[] buffer = new byte[_StreamBufferSize];
 
-                while (bytesRemaining > 0)
+            if (!File.Exists(file)){
+                using (FileStream fs = new FileStream(file, FileMode.Create))
                 {
-                    read = stream.Read(buffer, 0, buffer.Length);
-                    if (read > 0)
+                    long bytesRemaining = contentLength;
+                    int read = 0;
+                    byte[] buffer = new byte[_StreamBufferSize];
+
+                    while (bytesRemaining > 0)
                     {
-                        fs.Write(buffer, 0, read);
-                        bytesRemaining -= read;
+                        read = stream.Read(buffer, 0, buffer.Length);
+                        if (read > 0)
+                        {
+                            fs.Write(buffer, 0, read);
+                            bytesRemaining -= read;
+                        }
                     }
                 }
             }
@@ -389,19 +396,21 @@ namespace Less3.Storage
             if (String.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
 
             string file = FilePath(key, stream);
-            using (FileStream fs = new FileStream(file, FileMode.Create))
-            {
-                long bytesRemaining = contentLength;
-                int read = 0;
-                byte[] buffer = new byte[_StreamBufferSize];
-
-                while (bytesRemaining > 0)
+            if (!File.Exists(file)){
+                using (FileStream fs = new FileStream(file, FileMode.Create))
                 {
-                    read = await stream.ReadAsync(buffer, 0, buffer.Length);
-                    if (read > 0)
+                    long bytesRemaining = contentLength;
+                    int read = 0;
+                    byte[] buffer = new byte[_StreamBufferSize];
+
+                    while (bytesRemaining > 0)
                     {
-                        await fs.WriteAsync(buffer, 0, read);
-                        bytesRemaining -= read;
+                        read = await stream.ReadAsync(buffer, 0, buffer.Length);
+                        if (read > 0)
+                        {
+                            await fs.WriteAsync(buffer, 0, read);
+                            bytesRemaining -= read;
+                        }
                     }
                 }
             }
@@ -431,9 +440,9 @@ namespace Less3.Storage
             string keyHash = BitConverter.ToString(Common.Sha256(key)).Replace("-", "").ToLower();
             if (File.Exists(_BaseDirectory + keyHash)) {
                 string dataHash = File.ReadAllText(_BaseDirectory + keyHash).Trim();
-                return _BaseDirectory + dataHash;
+                return _unifyDir + dataHash;
             }
-            return _BaseDirectory + "thisfiledoesnotexists";
+            return _unifyDir + "thisfiledoesnotexists";
         }
         
         private string FilePath(string key, Stream stream)
@@ -443,7 +452,7 @@ namespace Less3.Storage
             string dataHash = BitConverter.ToString(Common.Sha256(stream)).Replace("-", "").ToLower();
             stream.Position = 0;
             File.WriteAllText(_BaseDirectory + keyHash, dataHash);
-            return _BaseDirectory + dataHash;
+            return _unifyDir + dataHash;
         }
          
         #endregion

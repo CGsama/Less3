@@ -1328,17 +1328,17 @@ namespace Less3.Api.S3
             string key = obj.BlobFilename;
             string baseDir = bucket.DiskDirectory;
 
-            Console.Write(baseDir + "   |   " + key);
+            //Console.Write(baseDir + "   |   " + key);
             //return baseDir + key;
 
             string keyHash = BitConverter.ToString(Common.Sha256(key)).Replace("-", "").ToLower();
-            Console.Write(baseDir + keyHash);
+            //Console.Write(baseDir + keyHash);
             if (File.Exists(baseDir + keyHash)) {
                 string dataHash = File.ReadAllText(baseDir + keyHash).Trim();
-                Console.Write(dataHash);
+                //Console.Write(dataHash);
                 return baseDir + dataHash;
             }
-            Console.Write("no such file");
+            //Console.Write("no such file");
             return baseDir + "thisfiledoesnotexists";
         }
          
