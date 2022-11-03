@@ -161,6 +161,11 @@ namespace Less3.Classes
             if (!Directory.Exists(settings.Storage.DiskDirectory))
                 Directory.CreateDirectory(settings.Storage.DiskDirectory);
 
+            string unifyDir = settings.Storage.DiskDirectory.EndsWith("/") ? settings.Storage.DiskDirectory + "_unify" : settings.Storage.DiskDirectory + "/_unify";
+
+            if (!Directory.Exists(unifyDir))
+                Directory.CreateDirectory(unifyDir);
+
             if (!Directory.Exists(settings.Storage.TempDirectory))
                 Directory.CreateDirectory(settings.Storage.TempDirectory);
 
