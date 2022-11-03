@@ -358,6 +358,7 @@ namespace Less3.Storage
             string file = FilePath(key, stream);
 
             if (!File.Exists(file)){
+                Directory.CreateDirectory(Path.GetDirectoryName(file));
                 using (FileStream fs = new FileStream(file, FileMode.Create))
                 {
                     long bytesRemaining = contentLength;
@@ -397,6 +398,7 @@ namespace Less3.Storage
 
             string file = FilePath(key, stream);
             if (!File.Exists(file)){
+                Directory.CreateDirectory(Path.GetDirectoryName(file));
                 using (FileStream fs = new FileStream(file, FileMode.Create))
                 {
                     long bytesRemaining = contentLength;
