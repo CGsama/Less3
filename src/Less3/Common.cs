@@ -839,29 +839,29 @@ namespace Less3
             }
         }
         
-        public static byte[] Sha256(byte[] data)
+        public static byte[] Sha512(byte[] data)
         {
             if (data == null) return null;
-            return SHA256.Create().ComputeHash(data);
+            return SHA512.Create().ComputeHash(data);
         }
 
-        public static byte[] Sha256(string data)
+        public static byte[] Sha512(string data)
         {
             if (String.IsNullOrEmpty(data)) return null;
-            return Sha256(Encoding.UTF8.GetBytes(data));
+            return Sha512(Encoding.UTF8.GetBytes(data));
         }
 
-        public static byte[] Sha256(Stream stream)
+        public static byte[] Sha512(Stream stream)
         {
             if (stream == null || !stream.CanRead) return null;
 
-            SHA256 sha256 = SHA256.Create();
-            return sha256.ComputeHash(stream);
+            SHA512 sha512 = SHA512.Create();
+            return sha512.ComputeHash(stream);
         }
 
-        public static async Task<byte[]> Sha256Async(Stream stream, int bufferSize)
+        public static async Task<byte[]> Sha512Async(Stream stream, int bufferSize)
         {
-            using (var sha256 = SHA256.Create())
+            using (var sha512 = SHA512.Create())
             {
                 byte[] buffer = new byte[bufferSize];
                 int read = 0;
@@ -871,12 +871,12 @@ namespace Less3
                     read = await stream.ReadAsync(buffer, 0, bufferSize);
                     if (read > 0)
                     {
-                        sha256.TransformBlock(buffer, 0, read, null, 0);
+                        sha512.TransformBlock(buffer, 0, read, null, 0);
                     }
                 } while (read > 0);
 
-                sha256.TransformFinalBlock(buffer, 0, 0);
-                return sha256.Hash; 
+                sha512.TransformFinalBlock(buffer, 0, 0);
+                return sha512.Hash; 
             }
         }
 
@@ -898,6 +898,15 @@ namespace Less3
         {
             if (data == null) return null;
             using (SHA1 hash = SHA1.Create())
+            {
+                return hash.ComputeHash(data);
+            }
+        }
+
+        public static byte[] Sha256(byte[] data)
+        {
+            if (data == null) return null;
+            using (SHA256 hash = SHA256.Create())
             {
                 return hash.ComputeHash(data);
             }

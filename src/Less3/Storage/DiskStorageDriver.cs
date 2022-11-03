@@ -430,16 +430,16 @@ namespace Less3.Storage
         private string FileIndexPath(string key)
         {
             //Console.Write("FileIndexPath" + _BaseDirectory + key);
-            string keyHash = BitConverter.ToString(Common.Sha256(key)).Replace("-", "").ToLower();
-            return _BaseDirectory + keyHash;
+            //string keyHash = BitConverter.ToString(Common.Sha256(key)).Replace("-", "").ToLower();
+            return _BaseDirectory + key;
         }
         
         private string FilePath(string key)
         {
             //Console.Write("FilePath01" + _BaseDirectory + key);
-            string keyHash = BitConverter.ToString(Common.Sha256(key)).Replace("-", "").ToLower();
-            if (File.Exists(_BaseDirectory + keyHash)) {
-                string dataHash = File.ReadAllText(_BaseDirectory + keyHash).Trim();
+            //string keyHash = BitConverter.ToString(Common.Sha256(key)).Replace("-", "").ToLower();
+            if (File.Exists(_BaseDirectory + key)) {
+                string dataHash = File.ReadAllText(_BaseDirectory + key).Trim();
                 return _unifyDir + dataHash;
             }
             return _unifyDir + "thisfiledoesnotexists";
@@ -448,10 +448,10 @@ namespace Less3.Storage
         private string FilePath(string key, Stream stream)
         {
             //Console.Write("FilePath02" + _BaseDirectory + key);
-            string keyHash = BitConverter.ToString(Common.Sha256(key)).Replace("-", "").ToLower();
-            string dataHash = BitConverter.ToString(Common.Sha256(stream)).Replace("-", "").ToLower();
+            //string keyHash = BitConverter.ToString(Common.Sha256(key)).Replace("-", "").ToLower();
+            string dataHash = BitConverter.ToString(Common.Sha512(stream)).Replace("-", "/").ToLower();
             stream.Position = 0;
-            File.WriteAllText(_BaseDirectory + keyHash, dataHash);
+            File.WriteAllText(_BaseDirectory + key, dataHash);
             return _unifyDir + dataHash;
         }
          
