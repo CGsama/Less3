@@ -1317,7 +1317,28 @@ namespace Less3.Api.S3
 
         private string GetObjectBlobFile(Classes.Bucket bucket, Obj obj)
         {
-            return bucket.DiskDirectory + obj.BlobFilename;
+            string key = obj.BlobFilename;
+            string baseDir = bucket.DiskDirectory;
+
+            if (!baseDir.EndsWith("/")) baseDir += "/";
+
+            //Console.Write(baseDir + "   |   " + key);
+            //return baseDir + key;
+
+            //string keyHash = BitConverter.ToString(Common.Sha256(key)).Replace("-", "").ToLower();
+            string fileIndex = baseDir + key;
+
+            //Console.Write(baseDir + keyHash);
+            if (File.Exists(fileIndex)) {
+                string dataHash = File.ReadAllText(fileIndex).Trim();
+                string _unifyDir = _Settings.Storage.DiskDirectory;
+                if (!_unifyDir.EndsWith("/")) _unifyDir += "/";
+                _unifyDir += "_unify/";
+                //Console.Write(dataHash);
+                return _unifyDir + dataHash;
+            }
+            //Console.Write("no such file");
+            return baseDir + "thisfiledoesnotexists";
         }
          
         private List<Grant> GrantsFromHeaders(User user, NameValueCollection headers)

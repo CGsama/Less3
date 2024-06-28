@@ -440,6 +440,47 @@ namespace Less3
                 return md5.Hash; 
             }
         }
+        
+        public static byte[] Sha512(byte[] data)
+        {
+            if (data == null) return null;
+            return SHA512.Create().ComputeHash(data);
+        }
+
+        public static byte[] Sha512(string data)
+        {
+            if (String.IsNullOrEmpty(data)) return null;
+            return Sha512(Encoding.UTF8.GetBytes(data));
+        }
+
+        public static byte[] Sha512(Stream stream)
+        {
+            if (stream == null || !stream.CanRead) return null;
+
+            SHA512 sha512 = SHA512.Create();
+            return sha512.ComputeHash(stream);
+        }
+
+        public static async Task<byte[]> Sha512Async(Stream stream, int bufferSize)
+        {
+            using (var sha512 = SHA512.Create())
+            {
+                byte[] buffer = new byte[bufferSize];
+                int read = 0;
+
+                do
+                {
+                    read = await stream.ReadAsync(buffer, 0, bufferSize);
+                    if (read > 0)
+                    {
+                        sha512.TransformBlock(buffer, 0, read, null, 0);
+                    }
+                } while (read > 0);
+
+                sha512.TransformFinalBlock(buffer, 0, 0);
+                return sha512.Hash; 
+            }
+        }
 
         #endregion
 

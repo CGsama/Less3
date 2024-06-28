@@ -39,6 +39,7 @@ namespace Less3.Storage
         private CancellationTokenSource _TokenSource = new CancellationTokenSource();
         private CancellationToken _Token;
         private string _BaseDirectory = null;
+        private string _unifyDir = null;
         private int _StreamBufferSize = 65536;
 
         #endregion
@@ -59,6 +60,9 @@ namespace Less3.Storage
 
             _BaseDirectory = baseDirectory;
             _Token = _TokenSource.Token;
+            _unifyDir = Settings.FromFile("system.json").Storage.DiskDirectory;
+            if (!_unifyDir.EndsWith("/")) _unifyDir += "/";
+            _unifyDir += "_unify/";
         }
 
         #endregion
@@ -72,7 +76,7 @@ namespace Less3.Storage
         public override void Delete(string key)
         {
             if (String.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
-            string file = FilePath(key);
+            string file = FileIndexPath(key);
             if (File.Exists(file)) File.Delete(file);
         }
 
@@ -84,7 +88,7 @@ namespace Less3.Storage
         public override bool Exists(string key)
         {
             if (String.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
-            string file = FilePath(key);
+            string file = FileIndexPath(key);
             if (File.Exists(file)) return true;
             return false;
         }
@@ -351,20 +355,24 @@ namespace Less3.Storage
         { 
             if (String.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
 
-            string file = FilePath(key);
-            using (FileStream fs = new FileStream(file, FileMode.Create))
-            {
-                long bytesRemaining = contentLength;
-                int read = 0;
-                byte[] buffer = new byte[_StreamBufferSize];
+            string file = FilePath(key, stream);
 
-                while (bytesRemaining > 0)
+            if (!File.Exists(file)){
+                Directory.CreateDirectory(Path.GetDirectoryName(file));
+                using (FileStream fs = new FileStream(file, FileMode.Create))
                 {
-                    read = stream.Read(buffer, 0, buffer.Length);
-                    if (read > 0)
+                    long bytesRemaining = contentLength;
+                    int read = 0;
+                    byte[] buffer = new byte[_StreamBufferSize];
+
+                    while (bytesRemaining > 0)
                     {
-                        fs.Write(buffer, 0, read);
-                        bytesRemaining -= read;
+                        read = stream.Read(buffer, 0, buffer.Length);
+                        if (read > 0)
+                        {
+                            fs.Write(buffer, 0, read);
+                            bytesRemaining -= read;
+                        }
                     }
                 }
             }
@@ -388,20 +396,23 @@ namespace Less3.Storage
         {
             if (String.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
 
-            string file = FilePath(key);
-            using (FileStream fs = new FileStream(file, FileMode.Create))
-            {
-                long bytesRemaining = contentLength;
-                int read = 0;
-                byte[] buffer = new byte[_StreamBufferSize];
-
-                while (bytesRemaining > 0)
+            string file = FilePath(key, stream);
+            if (!File.Exists(file)){
+                Directory.CreateDirectory(Path.GetDirectoryName(file));
+                using (FileStream fs = new FileStream(file, FileMode.Create))
                 {
-                    read = await stream.ReadAsync(buffer, 0, buffer.Length);
-                    if (read > 0)
+                    long bytesRemaining = contentLength;
+                    int read = 0;
+                    byte[] buffer = new byte[_StreamBufferSize];
+
+                    while (bytesRemaining > 0)
                     {
-                        await fs.WriteAsync(buffer, 0, read);
-                        bytesRemaining -= read;
+                        read = await stream.ReadAsync(buffer, 0, buffer.Length);
+                        if (read > 0)
+                        {
+                            await fs.WriteAsync(buffer, 0, read);
+                            bytesRemaining -= read;
+                        }
                     }
                 }
             }
@@ -418,9 +429,32 @@ namespace Less3.Storage
 
         #region Private-Methods
          
+        private string FileIndexPath(string key)
+        {
+            //Console.Write("FileIndexPath" + _BaseDirectory + key);
+            //string keyHash = BitConverter.ToString(Common.Sha256(key)).Replace("-", "").ToLower();
+            return _BaseDirectory + key;
+        }
+        
         private string FilePath(string key)
         {
-            return _BaseDirectory + key;
+            //Console.Write("FilePath01" + _BaseDirectory + key);
+            //string keyHash = BitConverter.ToString(Common.Sha256(key)).Replace("-", "").ToLower();
+            if (File.Exists(_BaseDirectory + key)) {
+                string dataHash = File.ReadAllText(_BaseDirectory + key).Trim();
+                return _unifyDir + dataHash;
+            }
+            return _unifyDir + "thisfiledoesnotexists";
+        }
+        
+        private string FilePath(string key, Stream stream)
+        {
+            //Console.Write("FilePath02" + _BaseDirectory + key);
+            //string keyHash = BitConverter.ToString(Common.Sha256(key)).Replace("-", "").ToLower();
+            string dataHash = BitConverter.ToString(Common.Sha512(stream)).Replace("-", "/").ToLower();
+            stream.Position = 0;
+            File.WriteAllText(_BaseDirectory + key, dataHash);
+            return _unifyDir + dataHash;
         }
          
         #endregion
