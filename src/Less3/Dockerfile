@@ -7,3 +7,5 @@ WORKDIR /app
 COPY ./system.json ./system.json
 COPY ./less3.db ./less3.db
 COPY ./start.sh ./start.sh
+
+ENTRYPOINT ["bash", "start.sh"]
