@@ -22,10 +22,11 @@ COPY --from=build /app/out .
 # database and storage settings.  Refer to Docker.md for details.
 #
 COPY ./system.json .
-COPY ./less3.db .
+#COPY ./less3.db .
 RUN mkdir Logs
 RUN mkdir Storage
 RUN mkdir Temp
+RUN mkdir /data
 #
 
 #
