@@ -1,5 +1,6 @@
-mkdir -p /data/less3disk
-mkdir -p /data/temp
-mkdir -p /data/logs
-cp -n /app/less3.db /data/less3.db
-dotnet Less3.dll
+mkdir -p /data/less3disk && echo ok
+mkdir -p /data/temp && echo ok
+mkdir -p /data/logs && echo ok
+cp -n /app/less3.db /data/less3.db && echo ok
+systemctl start nginx && echo ok
+dotnet Less3.dll && echo ok
