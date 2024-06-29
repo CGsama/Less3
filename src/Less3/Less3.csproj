@@ -28,7 +28,7 @@
 
   <ItemGroup>
     <PackageReference Include="Inputty" Version="1.0.4" />
-    <PackageReference Include="S3Server" Version="5.0.14" />
+    <ProjectReference Include="..\S3Server\S3Server.csproj" />
     <PackageReference Include="SyslogLogging" Version="2.0.1.8" />
     <PackageReference Include="WatsonORM" Version="2.0.2.3" />
     <PackageReference Include="XmlToPox" Version="1.0.2.2" />

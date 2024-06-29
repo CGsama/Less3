@@ -1,7 +1,11 @@
 FROM cgsama/dotnet-sdk-7-runtime-3-1:latest
+ENV LANG=en_US.UTF-8
 RUN apt-get install -y systemctl nginx
 WORKDIR /src
-COPY . ./
+COPY . ./Less3/
+COPY ./S3Server ./S3Server/
+WORKDIR /src/Less3
+RUN rm -r ./S3Server
 RUN dotnet build -f netcoreapp3.1
 RUN dotnet publish -f netcoreapp3.1 -o /app
 WORKDIR /app
