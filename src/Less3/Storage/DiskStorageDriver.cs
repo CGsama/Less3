@@ -355,7 +355,7 @@ namespace Less3.Storage
         { 
             if (String.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
 
-            string file = FilePath(key, stream);
+            string file = FilePath(key, stream, contentLength);
 
             if (!File.Exists(file)){
                 Directory.CreateDirectory(Path.GetDirectoryName(file));
@@ -396,7 +396,7 @@ namespace Less3.Storage
         {
             if (String.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
 
-            string file = FilePath(key, stream);
+            string file = FilePath(key, stream, contentLength);
             if (!File.Exists(file)){
                 Directory.CreateDirectory(Path.GetDirectoryName(file));
                 using (FileStream fs = new FileStream(file, FileMode.Create))
@@ -447,11 +447,12 @@ namespace Less3.Storage
             return _unifyDir + "thisfiledoesnotexists";
         }
         
-        private string FilePath(string key, Stream stream)
+        private string FilePath(string key, Stream stream, long contentLength)
         {
             //Console.Write("FilePath02" + _BaseDirectory + key);
             //string keyHash = BitConverter.ToString(Common.Sha256(key)).Replace("-", "").ToLower();
-            string dataHash = BitConverter.ToString(Common.Sha512(stream)).Replace("-", "/").ToLower();
+            //string dataHash = BitConverter.ToString(Common.Sha512(stream)).Replace("-", "/").ToLower();
+            string dataHash = BitConverter.ToString(Common.Md5(stream)).Replace("-", "/").ToLower() + "/" + string.Format("{0:X}", contentLength).ToLower();
             stream.Position = 0;
             File.WriteAllText(_BaseDirectory + key, dataHash);
             return _unifyDir + dataHash;
