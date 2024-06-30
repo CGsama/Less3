@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Less3.Classes;
@@ -452,7 +453,12 @@ namespace Less3.Storage
             //Console.Write("FilePath02" + _BaseDirectory + key);
             //string keyHash = BitConverter.ToString(Common.Sha256(key)).Replace("-", "").ToLower();
             //string dataHash = BitConverter.ToString(Common.Sha512(stream)).Replace("-", "/").ToLower();
-            string dataHash = BitConverter.ToString(Common.Md5(stream)).Replace("-", "/").ToLower() + "/" + string.Format("{0:X}", contentLength).ToLower();
+            string sha256 = BitConverter.ToString(Common.Sha256(stream)).Replace("-", "").ToLower();
+            stream.Seek(0, SeekOrigin.Begin);
+            //md5 as base hash for compatibility, then sha256 for cryptographically secure
+            //keep max 4k entries in single folder
+            string md5 = string.Join(string.Empty,BitConverter.ToString(Common.Md5(stream)).Replace("-", "").ToLower().Select((x, i) => i > 0 && i % 3 == 0 ? string.Format("/{0}", x) : x.ToString()));
+            string dataHash = md5 + "/" + sha256;
             stream.Position = 0;
             File.WriteAllText(_BaseDirectory + key, dataHash);
             return _unifyDir + dataHash;

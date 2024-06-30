@@ -912,6 +912,41 @@ namespace Less3
             }
         }
 
+        public static byte[] Sha256(string data)
+        {
+            if (String.IsNullOrEmpty(data)) return null;
+            return Sha256(Encoding.UTF8.GetBytes(data));
+        }
+
+        public static byte[] Sha256(Stream stream)
+        {
+            if (stream == null || !stream.CanRead) return null;
+
+            SHA256 sha256 = SHA256.Create();
+            return sha256.ComputeHash(stream);
+        }
+
+        public static async Task<byte[]> Sha256Async(Stream stream, int bufferSize)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                byte[] buffer = new byte[bufferSize];
+                int read = 0;
+
+                do
+                {
+                    read = await stream.ReadAsync(buffer, 0, bufferSize);
+                    if (read > 0)
+                    {
+                        sha256.TransformBlock(buffer, 0, read, null, 0);
+                    }
+                } while (read > 0);
+
+                sha256.TransformFinalBlock(buffer, 0, 0);
+                return sha256.Hash;
+            }
+        }
+
         #endregion
 
         #region Encoding
