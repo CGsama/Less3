@@ -44,7 +44,7 @@ namespace S3ServerLibrary.S3Objects
         [XmlElement(ElementName = "LastModified")]
         public string LastModifiedString
         {
-            get { return this.LastModified.ToString("yyyy-MM-ddTHH:mm:ss.fffz"); }
+            get { return this.LastModified.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"); }
             set { this.LastModified = DateTime.Parse(value); }
         }
 
