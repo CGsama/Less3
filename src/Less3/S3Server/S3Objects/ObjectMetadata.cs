@@ -24,9 +24,15 @@ namespace S3ServerLibrary.S3Objects
         /// <summary>
         /// Timestamp from the last modification of the resource.
         /// </summary>
-        [XmlElement(ElementName = "LastModified")]
+        [XmlIgnore]
         public DateTime LastModified { get; set; } = DateTime.Now.ToUniversalTime();
 
+        [XmlElement(ElementName = "LastModified")]
+        public string LastModifiedString
+        {
+            get { return this.LastModified.ToString("yyyy-MM-ddTHH:mm:ss.fffz"); }
+            set { this.LastModified = DateTime.Parse(value); }
+        }
         /// <summary>
         /// ETag of the resource.
         /// </summary>
